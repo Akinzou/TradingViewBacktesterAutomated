@@ -20,13 +20,16 @@ inv = args.inv
 decimal_places = args.decimal_places
 spread_pips = 10 ** -decimal_places
 #-----------------------------------
-
+    
 pips = 1/spread_pips
 
 if inv == "yes":
     invert = True
 else:
     invert = False
+
+sl = -999999 if sl == -1 else sl * -1
+if tp == -1: tp = 999999
 
 PNL = 0
 entry_price = 0
@@ -39,51 +42,35 @@ losslist = []
 winslist = []
 startingDate = 0
 
-# Wczytywanie danych
+
 positions_df = pd.read_csv('positions.csv')
 prices_df = pd.read_csv('prices.csv')
 
-# Praca na positions_df
-positions_types = positions_df['Type'].tolist()
-positions_dates = positions_df['Date/Time'].tolist()  # Dodanie listy dla daty/czasu
 
-# Usuwanie dwóch pierwszych elementów z list
+positions_types = positions_df['Type'].tolist()
+positions_dates = positions_df['Date/Time'].tolist()  
+
+
 positions_types = positions_types[2:]
 positions_dates = positions_dates[2:]
 
 
-
-# Odwracanie list
 positions_types.reverse()
 positions_dates.reverse()
 
 
-# Dodanie pół godziny do każdej daty w positions_dates
 print(positions_dates)
 positions_dates = [(datetime.strptime(date, '%Y-%m-%d %H:%M') + timedelta(minutes=args.time_frame)).strftime('%Y-%m-%d %H:%M') for date in positions_dates]
 print(positions_dates)
-
-# Praca na prices_df
 prices_df = prices_df.iloc[:, 0].str.split('\t', expand=True)
 prices_columns = ['DATE', 'TIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL', 'VOL', 'SPREAD']
 prices_df.columns = prices_columns
-
-# Konwersja DATE i TIME do datetime
 prices_df['DATE'] = pd.to_datetime(prices_df['DATE'], format='%Y.%m.%d')
 prices_df['TIME'] = pd.to_datetime(prices_df['TIME'], format='%H:%M:%S').dt.time
-
-# Połączenie DATE i TIME w jedną kolumnę DATETIME
 prices_df['DATETIME'] = pd.to_datetime(prices_df['DATE'].astype(str) + ' ' + prices_df['TIME'].astype(str))
-
-# Formatowanie DATETIME do formatu bez sekund
 prices_df['DATETIME'] = prices_df['DATETIME'].dt.strftime('%Y-%m-%d %H:%M')
-
-# Tworzenie listy prices_dates z połączonej kolumny DATETIME bez sekund
 prices_dates = prices_df['DATETIME'].tolist()
-
-# Usunięcie zbędnych kolumn
 prices_df.drop(columns=['DATE', 'TIME'], inplace=True)
-
 prices_close = prices_df['CLOSE'].tolist()
 prices_high = prices_df['HIGH'].tolist()
 prices_low = prices_df['LOW'].tolist()
@@ -113,10 +100,8 @@ def findmedian(prices):
         n = len(prices_sorted)
         srodek = n // 2
 
-        # Jeśli liczba elementów jest parzysta
         if n % 2 == 0:
             return str(round((prices_sorted[srodek - 1] + prices_sorted[srodek]) / 2, 2))  + " pips"
-        # Jeśli liczba elementów jest nieparzysta
         else:
             return str(round(prices_sorted[srodek], 2)) + " pips"
     else:
@@ -269,12 +254,12 @@ print(f'\n\nOverall:\n'
       )
 
 
-with open(file_name, 'a', newline='') as file:  # Tryb 'a' (append)
+with open(file_name, 'a', newline='') as file:  
     writer = csv.writer(file)
     winrate = round((wins / (wins + loss)) * 100, 2)
     TPrate = "NA" if (num_of_tp + num_of_sl) == 0 else f"{round((num_of_tp / (num_of_tp + num_of_sl)) * 100, 2)}%"
 
-    # Zapis danych na końcu pliku
+
     writer.writerow([
         tp, sl,
         winrate,
