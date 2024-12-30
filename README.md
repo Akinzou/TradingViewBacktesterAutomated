@@ -1,4 +1,4 @@
-# TradingViewBacktesterAutomated
+# TradingViewBacktesterAutomated [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)] [![Python package](https://github.com/Akinzou/TradingViewBacktesterAutomated/actions/workflows/python-app.yml/badge.svg)]
 
 ## Overview
 TradingView Backtester Automated is a Python-based tool designed to help traders evaluate and optimize their trading strategies using TradingView alerts. By combining trading signals with historical price data, this tool provides detailed performance analytics, enabling users to make data-driven decisions.
